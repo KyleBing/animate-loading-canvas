@@ -22,9 +22,10 @@ class AnimateLoadingCanvas {
             bgColor: bgColor
         }
         this.configLoading = {
-            layerCount: 100, // 层数
+            speedRotate: 1.5, // 速度乘比
+            layerCount: 150, // 层数
             width: 10, // 线条宽度
-            radius: 300, // 圆的半径
+            radius: 500, // 圆的半径
             distanceAngle: 220, // deg 圆的显示长度 0 - 360
             timeLine: 0,                           // 时间线
             duration: 50, // 以 timeLine 为基准
@@ -65,12 +66,11 @@ class AnimateLoadingCanvas {
         }
     }
     nextStep(){
-        this.draw()
+        this.configLoading.speedRotate = this.configLoading.speedRotate + 1
     }
 
     prevStep(){
-        this.configLoading.timeLine = this.configLoading.timeLine - 2
-        this.draw()
+        this.configLoading.speedRotate = this.configLoading.speedRotate - 1
     }
 
     play(){
@@ -163,7 +163,7 @@ class AnimateLoadingCanvas {
 
         this.configLoading.circleArray.forEach((item, index) => {
 
-            let startAngle = this.configLoading.timeLine * 1.5 % 360 + 50 * index
+            let startAngle = this.configLoading.timeLine * this.configLoading.speedRotate % 360 + 75 * index
             let endAngle = (startAngle + this.configLoading.distanceAngle + this.configLoading.timeLine) % 360 + 50 * index
 
             contextLoading.beginPath()
