@@ -22,7 +22,8 @@ class AnimateLoadingCanvas {
             bgColor: bgColor
         }
         this.configLoading = {
-            width: 1, // 线条宽度
+            layerCount: 100, // 层数
+            width: 5, // 线条宽度
             radius: 200, // 圆的半径
             distanceAngle: 220, // deg 圆的显示长度 0 - 360
             timeLine: 0,                           // 时间线
@@ -43,12 +44,14 @@ class AnimateLoadingCanvas {
             colorLight: 60,                        // 颜色亮度 0-100
             hMin: isNaN(hMin) ?0: hMin,          // 色值最小
             hMax: isNaN(hMax) ?360: hMax,          // 色值最大
-            minOpacity: 20,                        // 透明度最小 %
+            minOpacity: 100,                        // 透明度最小 %
             maxOpacity: 100,                       // 透明度最大 %
-            opacityGrowth: 5,                      // 透明度增长值
+            opacityGrowth: 60,                      // 透明度增长值
 
             characterArrayString: '10',
             characterArray: [],
+
+            circleArray: []
 
         }
 
@@ -124,6 +127,19 @@ class AnimateLoadingCanvas {
         this.configLoading.timeLine =  0
         this.configLoading.characterArray = this.configLoading.characterArrayString.split('')
 
+        for (let i=0;i<this.configLoading.layerCount;i++){
+            this.configLoading.circleArray.push({
+                color:randomColor(
+                    this.configLoading.hMin,
+                    this.configLoading.hMax,
+                    this.configLoading.minOpacity,
+                    this.configLoading.maxOpacity,
+                    this.configLoading.colorSaturate,
+                    this.configLoading.colorLight
+                ),
+            })
+        }
+
         this.draw()
         document.documentElement.addEventListener('mousemove', event => {
             this.mouseX = event.x
@@ -143,36 +159,41 @@ class AnimateLoadingCanvas {
             contextLoading.fillRect(0,0,this.configFrame.width, this.configFrame.height)
         }
 
-        let startAngle = this.configLoading.timeLine * 1.5 % 360
-        let endAngle = (startAngle + this.configLoading.distanceAngle + this.configLoading.timeLine) % 360
+        let gap = this.configLoading.radius / this.configLoading.layerCount
 
-        contextLoading.beginPath()
-        contextLoading.arc(
-            this.configFrame.width / 2,
-            this.configFrame.height / 2,
-            this.configLoading.radius,
-            Math.PI * (endAngle / 180),
-            Math.PI * (startAngle / 180),
-            true)
-        contextLoading.lineTo(
-            this.configFrame.width / 2,
-            this.configFrame.height / 2,
-        )
-        contextLoading.closePath()
-        let currentColor = `hsl(${this.configLoading.timeLine % 360}, ${100}%, ${50}%, ${100}%)`
-        contextLoading.fillStyle = currentColor
-        contextLoading.font = "60px Impact"
-        contextLoading.fillText(
-            this.configLoading.timeLine,
-            10,
-            this.configFrame.height - 20
+        this.configLoading.circleArray.forEach((item, index) => {
+
+            let startAngle = this.configLoading.timeLine * 1.5 % 360 + 50 * index
+            let endAngle = (startAngle + this.configLoading.distanceAngle + this.configLoading.timeLine) % 360 + 50 * index
+
+            contextLoading.beginPath()
+            contextLoading.arc(
+                this.configFrame.width / 2,
+                this.configFrame.height / 2,
+                this.configLoading.radius - gap * index,
+                Math.PI * (endAngle / 180),
+                Math.PI * (startAngle / 180),
+                true)
+            // contextLoading.lineTo(
+            //     this.configFrame.width / 2,
+            //     this.configFrame.height / 2,
+            // )
+            // contextLoading.closePath()
+
+            contextLoading.fillStyle = 'white'
+            contextLoading.font = "60px Impact"
+            contextLoading.fillText(
+                this.configLoading.timeLine,
+                10,
+                this.configFrame.height - 20
             )
-        contextLoading.lineWidth = this.configLoading.width
-        contextLoading.strokeStyle = currentColor
-        // contextLoading.fillStyle = 'rgba(255,255,255,0.5)'
-        contextLoading.fillStyle = currentColor
-        contextLoading.fill()
-        contextLoading.stroke()
+            contextLoading.lineWidth = this.configLoading.width
+            contextLoading.strokeStyle = item.color
+            contextLoading.fillStyle = item.color
+            // contextLoading.fill()
+            contextLoading.stroke()
+
+        })
 
 
         // 建立自己的时间参考线，消除使用系统时间时导致的切换程序后时间紊乱的情况
