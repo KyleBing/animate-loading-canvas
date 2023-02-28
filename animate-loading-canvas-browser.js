@@ -23,8 +23,8 @@ class AnimateLoadingCanvas {
         }
         this.configLoading = {
             layerCount: 100, // 层数
-            width: 5, // 线条宽度
-            radius: 200, // 圆的半径
+            width: 10, // 线条宽度
+            radius: 300, // 圆的半径
             distanceAngle: 220, // deg 圆的显示长度 0 - 360
             timeLine: 0,                           // 时间线
             duration: 50, // 以 timeLine 为基准
@@ -170,7 +170,7 @@ class AnimateLoadingCanvas {
             contextLoading.arc(
                 this.configFrame.width / 2,
                 this.configFrame.height / 2,
-                this.configLoading.radius - gap * index,
+                this.configLoading.radius - gap  * index,
                 Math.PI * (endAngle / 180),
                 Math.PI * (startAngle / 180),
                 true)
