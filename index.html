@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas Loading</title>
+    <script src="animate-loading-canvas-browser.js?v=001"></script>
+    <script>
+
+        let queryData = getSearchData()
+        let animateLoading = new AnimateLoadingCanvas('black', 0, 360)
+
+        window.addEventListener('keydown', event => {
+            switch (event.key){
+                case 'ArrowLeft': animateLoading.prevStep();break
+                case 'ArrowRight': animateLoading.nextStep();break
+                default: break
+            }
+        })
+
+        /****************************
+         *
+         *  获取地址栏get数据
+         *
+         *  - 有值的时候返回一个包含所有参数的对象
+         *  - 无值的时候，返回 `false`
+         *
+         ****************************/
+
+        function getSearchData(){
+            let searchString = location.search;
+            if (searchString){
+                let obj = {};
+                searchString = searchString.substring(1, searchString.length);
+                let tempArray = searchString.split('&');
+                tempArray.forEach(item => {
+                    obj[item.split('=')[0]] = decodeURIComponent(item.split('=')[1]);
+                });
+                return obj;
+            } else {
+                return false;
+            }
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>
