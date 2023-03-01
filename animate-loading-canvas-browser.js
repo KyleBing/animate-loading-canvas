@@ -21,13 +21,20 @@ class AnimateLoadingCanvas {
             height: 300,
             bgColor: bgColor
         }
+
+        this.timeline = 0   // 时间线
+
         this.configLoading = {
+            radiusMax: 400, // 圆圈最大宽度
+            gapAdd: 1, // 添加的间隔，当下面 tempIndex 大于这个值时，添加一层
+            gapAddDirection: 1, // +1 -1 圆圈加或减
+            tempIndex: 0,
             speedRotate: 1.5, // 速度乘比
-            layerCount: 150, // 层数
-            width: 10, // 线条宽度
-            radius: 500, // 圆的半径
+            layerCount: 4, // 层数
+            layerGap: 10, // 每层的间隔
+            lineWidth: 10, // 线条宽度
+            outRadius: 10, // 圆的半径
             distanceAngle: 220, // deg 圆的显示长度 0 - 360
-            timeLine: 0,                           // 时间线
             duration: 50, // 以 timeLine 为基准
 
             fontSize: 30,
@@ -65,13 +72,6 @@ class AnimateLoadingCanvas {
             this.updateFrameAttribute(loadingLayer)
         }
     }
-    nextStep(){
-        this.configLoading.speedRotate = this.configLoading.speedRotate + 1
-    }
-
-    prevStep(){
-        this.configLoading.speedRotate = this.configLoading.speedRotate - 1
-    }
 
     play(){
         if (this.isPlaying){
@@ -92,8 +92,36 @@ class AnimateLoadingCanvas {
         this.configLoading.flowDirection = 1
     }
 
-    speedUp(){}
-    speedDown(){}
+    addLayer(){
+        this.configLoading.outRadius = this.configLoading.outRadius + this.configLoading.layerGap // 最后的 outRadius
+        this.configLoading.tempIndex = 0
+        this.configLoading.circleArray.push({
+            color: randomColor(
+                this.configLoading.hMin,
+                this.configLoading.hMax,
+                this.configLoading.minOpacity,
+                this.configLoading.maxOpacity,
+                this.configLoading.colorSaturate,
+                this.configLoading.colorLight
+            ),
+            radius:  this.configLoading.outRadius,
+        })
+    }
+    removeLayer(){
+        this.configLoading.circleArray.pop()
+        this.configLoading.outRadius = this.configLoading.outRadius - this.configLoading.layerGap // 最后的 outRadius
+        if (this.configLoading.outRadius < 0){
+            this.configLoading.outRadius = 0
+            this.configLoading.gapAddDirection = 1
+        }
+    }
+
+    speedUp(){
+        this.configLoading.speedRotate = this.configLoading.speedRotate - 1
+    }
+    speedDown(){
+        this.configLoading.speedRotate = this.configLoading.speedRotate + 1
+    }
 
     destroy(){
         this.isPlaying = false
@@ -124,8 +152,8 @@ class AnimateLoadingCanvas {
         this.updateFrameAttribute(loadingLayer)
         document.documentElement.append(loadingLayer)
 
-        this.configLoading.timeLine =  0
         this.configLoading.characterArray = this.configLoading.characterArrayString.split('')
+        this.configLoading.layerGap = this.configLoading.outRadius / this.configLoading.layerCount
 
         for (let i=0;i<this.configLoading.layerCount;i++){
             this.configLoading.circleArray.push({
@@ -137,6 +165,7 @@ class AnimateLoadingCanvas {
                     this.configLoading.colorSaturate,
                     this.configLoading.colorLight
                 ),
+                radius:  this.configLoading.outRadius - this.configLoading.layerGap * i,
             })
         }
 
@@ -158,24 +187,38 @@ class AnimateLoadingCanvas {
             contextLoading.fillStyle = this.configFrame.bgColor
             contextLoading.fillRect(0,0,this.configFrame.width, this.configFrame.height)
         }
+        if (this.configLoading.outRadius < this.configLoading.radiusMax){ // 达到最大 radius
+            if (this.configLoading.tempIndex > this.configLoading.gapAdd){ // 达到该添加圆圈的点时
+                if (this.configLoading.gapAddDirection > 0){
+                    this.configLoading.gapAddDirection = 1
+                    this.addLayer()
+                } else if (this.configLoading.gapAddDirection < 0){
+                    this.configLoading.gapAddDirection = -1
+                    this.removeLayer()
+                }
+            }
+        } else {
+            // this.configLoading.gapAddDirection = -1
+            // this.removeLayer()
+        }
 
-        let gap = this.configLoading.radius / this.configLoading.layerCount
+
 
         this.configLoading.circleArray.forEach((item, index) => {
 
-            let startAngle = this.configLoading.timeLine * this.configLoading.speedRotate % 360 + 75 * index
-            let endAngle = (startAngle + this.configLoading.distanceAngle + this.configLoading.timeLine) % 360 + 50 * index
+            let startAngle = this.timeline * this.configLoading.speedRotate % 360 + 75 * index
+            let endAngle = (startAngle + this.configLoading.distanceAngle + this.timeline) % 360 + 50 * index
 
             contextLoading.beginPath()
             contextLoading.arc(
                 this.configFrame.width / 2,
                 this.configFrame.height / 2,
-                this.configLoading.radius - gap  * index,
+                item.radius,
                 Math.PI * (endAngle / 180),
                 Math.PI * (startAngle / 180),
                 true)
             // contextLoading.lineTo(
-            //     this.configFrame.width / 2,
+            //     this.configFrame.lineWidth / 2,
             //     this.configFrame.height / 2,
             // )
             // contextLoading.closePath()
@@ -183,11 +226,11 @@ class AnimateLoadingCanvas {
             contextLoading.fillStyle = 'white'
             contextLoading.font = "60px Impact"
             contextLoading.fillText(
-                this.configLoading.timeLine,
+                this.timeline,
                 10,
                 this.configFrame.height - 20
             )
-            contextLoading.lineWidth = this.configLoading.width
+            contextLoading.lineWidth = this.configLoading.lineWidth
             contextLoading.strokeStyle = item.color
             contextLoading.fillStyle = item.color
             // contextLoading.fill()
@@ -197,8 +240,9 @@ class AnimateLoadingCanvas {
 
 
         // 建立自己的时间参考线，消除使用系统时间时导致的切换程序后时间紊乱的情况
-        this.configLoading.timeLine = this.configLoading.timeLine + 1
-        // if (this.configLoading.timeLine > 3) return
+        this.timeline = this.timeline + 1
+        this.configLoading.tempIndex = this.configLoading.tempIndex + 1
+        // if (this.timeline > 3) return
 
         if (this.isPlaying) {
             window.requestAnimationFrame(() => {
