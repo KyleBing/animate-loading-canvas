@@ -1,5 +1,5 @@
 {
-  "name": "animate-bg-text-canvas",
+  "name": "animate-loading-canvas",
   "version": "0.0.1",
   "description": "",
   "main": "animate-loading-canvas.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KyleBing/animate-bg-text-canvas.git"
+    "url": "git+https://github.com/KyleBing/animate-loading-canvas.git"
   },
   "keywords": [
     "canvas",
@@ -19,9 +19,9 @@
   "author": "KyleBing",
   "license": "GPL",
   "bugs": {
-    "url": "https://github.com/KyleBing/animate-bg-text-canvas/issues"
+    "url": "https://github.com/KyleBing/animate-loading-canvas/issues"
   },
-  "homepage": "https://github.com/KyleBing/animate-bg-text-canvas#readme",
+  "homepage": "https://github.com/KyleBing/animate-loading-canvas#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   }

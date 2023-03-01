@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Canvas Loading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="animate-loading-canvas-browser.js?v=001"></script>
     <script>
-
         let queryData = getSearchData()
         let animateLoading = new AnimateLoadingCanvas('black', 0, 360)
 
@@ -50,7 +50,24 @@
         }
     </script>
 </head>
-<body>
 
+<body>
+    <a class="github-btn" href="https://github.com/KyleBing/animate-loading-canvas">github</a>
 </body>
+
+<style>
+    .github-btn{
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+        font-size: 14px;
+        text-align: center;
+        padding: 5px 10px;
+        color: white;
+        cursor: pointer;
+    }
+    .github-btn:hover {
+        color: magenta;
+    }
+</style>
 </html>
